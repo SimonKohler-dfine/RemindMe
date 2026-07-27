@@ -7,8 +7,10 @@ from storage.importer import ExcelImporter
 def main():
     print("--- [STEP 2] Importing Sample Excel File ---")
 
-    # 1. Create a sample Excel file
-    sample_file = Path("testing/sample_data.xlsx")
+    imports_dir = Path("imports")
+    imports_dir.mkdir(parents=True, exist_ok=True)
+
+    sample_file = imports_dir / "sample_data.xlsx"
     df = pd.DataFrame([
         {"Title": "Refactor Codebase", "Category": "Architecture", "Duration": 45},
         {"Title": "Verify DBeaver Connection", "Category": "Testing", "Duration": 15},
@@ -16,13 +18,12 @@ def main():
     ])
     df.to_excel(sample_file, index=False)
 
-    # 2. Stage to DB
     db = DatabaseManager()
     importer = ExcelImporter(db)
     import_id = importer.import_excel(sample_file)
     print(f"Excel file staged successfully under batch ID: {import_id}")
 
-    # Clean up test Excel file
+    # Clean up test file inside imports/
     if sample_file.exists():
         sample_file.unlink()
 

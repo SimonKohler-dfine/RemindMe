@@ -20,3 +20,7 @@ env/
 # Operating System files
 .DS_Store
 Thumbs.db
+
+# Local data directories
+imports/
+exports/
