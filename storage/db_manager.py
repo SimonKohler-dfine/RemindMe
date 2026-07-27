@@ -1,6 +1,7 @@
 from pathlib import Path
 import duckdb
 
+
 class DatabaseManager:
     """Manages DuckDB connection lifecycle, normalized schema, and presentation views."""
 
@@ -36,7 +37,7 @@ class DatabaseManager:
                 )
             """)
 
-            # 3. Normalized tasks table referencing process_id
+            # 3. Normalized tasks table
             con.execute("""
                 CREATE TABLE IF NOT EXISTS tasks (
                     task_id VARCHAR PRIMARY KEY,
@@ -62,8 +63,3 @@ class DatabaseManager:
                 FROM tasks t
                 JOIN import_processing ip ON t.process_id = ip.process_id
             """)
-
-
-if __name__ == "__main__":
-    db = DatabaseManager()
-    print(f"Database schema & views initialized successfully at: {db.db_path.resolve()}")

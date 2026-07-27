@@ -17,7 +17,6 @@ class TaskProcessor:
         total_processed = 0
 
         with self.db_manager.get_connection() as con:
-            # Identify import_ids not yet present in import_processing
             unprocessed_batches = con.execute("""
                 SELECT DISTINCT import_id 
                 FROM raw_imports 
@@ -27,11 +26,9 @@ class TaskProcessor:
             """).fetchall()
 
             if not unprocessed_batches:
-                print("No pending imports to process.")
                 return 0
 
             for (import_id,) in unprocessed_batches:
-                # Generate a execution process ID
                 timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
                 process_id = f"PRC_{timestamp_str}_{str(uuid.uuid4())[:4]}"
 
@@ -51,7 +48,6 @@ class TaskProcessor:
                         category = payload.get("Category", "General")
                         duration = int(payload.get("Duration", 0))
 
-                        # Insert into normalized tasks table with process_id as FK
                         con.execute("""
                             INSERT INTO tasks (task_id, process_id, title, category, duration_minutes)
                             VALUES (?, ?, ?, ?, ?)
@@ -59,7 +55,6 @@ class TaskProcessor:
 
                         batch_count += 1
 
-                    # Log execution details with process_id as PK
                     con.execute("""
                         INSERT INTO import_processing (process_id, import_id, row_count, status)
                         VALUES (?, ?, ?, ?)
@@ -67,7 +62,6 @@ class TaskProcessor:
 
                     con.commit()
                     total_processed += batch_count
-                    print(f"Processed import '{import_id}' under process_id '{process_id}' ({batch_count} rows).")
 
                 except Exception as e:
                     con.rollback()
@@ -78,10 +72,3 @@ class TaskProcessor:
                     raise RuntimeError(f"Processing batch {import_id} failed: {e}") from e
 
         return total_processed
-
-
-if __name__ == "__main__":
-    db = DatabaseManager()
-    processor = TaskProcessor(db)
-    count = processor.process_pending_imports()
-    print(f"Total tasks processed in run: {count}")

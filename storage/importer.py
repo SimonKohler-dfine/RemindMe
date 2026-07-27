@@ -23,7 +23,6 @@ class ExcelImporter:
         df = pd.read_excel(path)
         records = df.to_dict(orient="records")
 
-        # Generate a unique batch ID per import run
         timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
         import_id = f"IMP_{timestamp_str}_{path.stem}"
         source_name = path.name
@@ -46,21 +45,3 @@ class ExcelImporter:
                 raise RuntimeError(f"Failed to stage Excel data: {e}") from e
 
         return import_id
-
-
-if __name__ == "__main__":
-    test_file = Path("test_tasks.xlsx")
-    sample_data = pd.DataFrame([
-        {"Title": "Vault Architecture Test", "Category": "Dev", "Duration": 60},
-        {"Title": "Configure Logging", "Category": "Dev", "Duration": 20},
-    ])
-    sample_data.to_excel(test_file, index=False)
-
-    db = DatabaseManager()
-    importer = ExcelImporter(db)
-    batch_id = importer.import_excel(test_file)
-
-    print(f"Successfully staged batch '{batch_id}' into raw_imports.")
-
-    if test_file.exists():
-        test_file.unlink()
