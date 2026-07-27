@@ -1,0 +1,22 @@
+# PyCharm / JetBrains IDE settings
+.idea/
+
+# Python byte code & caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments (virtualenvs)
+.venv/
+venv/
+ENV/
+env/
+
+# Database files (local DuckDB instances shouldn't go to remote Git)
+*.duckdb
+*.db
+*.sqlite3
+
+# Operating System files
+.DS_Store
+Thumbs.db
